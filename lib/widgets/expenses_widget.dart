@@ -1,4 +1,5 @@
 import 'package:expenses_tracker/widgets/add_new_expense.dart';
+import 'package:expenses_tracker/widgets/chart/chart.dart';
 import 'package:expenses_tracker/widgets/expense_list/expense_list.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +30,7 @@ class _ExpensesState extends State<Expenses> {
 
   void _openAddExpenseOverlay() {
     showModalBottomSheet(
+      useSafeArea: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => AddNewExpense(onNewExpense: _addExpense),
@@ -64,6 +66,8 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     Widget mainContent = const Center(
       child: Text('No expense found. Start to add some expenses'),
     );
@@ -85,14 +89,27 @@ class _ExpensesState extends State<Expenses> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          const Text('the chart'),
-          Expanded(
-            child: mainContent,
-          ),
-        ],
-      ),
+      body: width < 600
+          ? Column(
+              children: [
+                Chart(expenses: _registeredExpense),
+                Expanded(
+                  child: mainContent,
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                // use expanded here cuz Row and Chart both take as much width as possible, which is error.
+                // so expanded constraint the child (Chart)
+                Expanded(
+                  child: Chart(expenses: _registeredExpense),
+                ),
+                Expanded(
+                  child: mainContent,
+                ),
+              ],
+            ),
     );
   }
 }
